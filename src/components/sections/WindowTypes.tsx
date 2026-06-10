@@ -9,7 +9,7 @@ const windowTypes = [
     description:
       "Sistema de cierre paralelo al muro. La ventana se desliza sobre un riel con suavidad. Ideal para espacios donde la ventana no puede proyectarse hacia afuera.",
     image:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=80&auto=format&fit=crop",
+      "/images/productos/CORRREDERA.png",
     tags: ["Más vendida", "Fácil uso"],
     color: "from-blue-600/80",
   },
@@ -18,7 +18,7 @@ const windowTypes = [
     description:
       "Sistema de apertura lateral con bisagras. Aprovecha al máximo la abertura y proporciona una hermeticidad superior al sistema corredera.",
     image:
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80&auto=format&fit=crop",
+      "/images/productos/ABATIBLE.png",
     tags: ["Alta hermeticidad"],
     color: "from-emerald-700/80",
   },
@@ -27,7 +27,7 @@ const windowTypes = [
     description:
       "Combina dos sistemas en uno: abre de forma abatible lateral y también oscila desde la parte superior. El sistema más versátil del mercado.",
     image:
-      "https://images.unsplash.com/photo-1600607687644-c7171b42498f?w=600&q=80&auto=format&fit=crop",
+      "/images/productos/OSCILOBATIENTE.png",
     tags: ["2 en 1", "Premium"],
     color: "from-purple-700/80",
   },
@@ -36,7 +36,7 @@ const windowTypes = [
     description:
       "Apertura desde la parte inferior hacia el exterior, con regulación de abertura. Perfecta para baños, cocinas y espacios que requieren ventilación controlada.",
     image:
-      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=600&q=80&auto=format&fit=crop",
+      "/images/productos/PROYECTANTE.png",
     tags: ["Ventilación controlada"],
     color: "from-orange-700/80",
   },
@@ -45,7 +45,7 @@ const windowTypes = [
     description:
       "Abre desde la parte superior hacia el interior. Permite ventilación sin riesgo de lluvia y es ideal para habitaciones con poco espacio.",
     image:
-      "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=600&q=80&auto=format&fit=crop",
+      "/images/productos/OSCILANTE.png",
     tags: ["Anti-lluvia"],
     color: "from-teal-700/80",
   },
@@ -54,7 +54,7 @@ const windowTypes = [
     description:
       "Ventana sin sistema de apertura, desde piso a cielo o media altura. Maximiza la luminosidad y las vistas panorámicas sin comprometer el aislamiento.",
     image:
-      "https://images.unsplash.com/photo-1600210492493-0946911123ea?w=600&q=80&auto=format&fit=crop",
+      "/images/productos/FIJA.png",
     tags: ["Máxima luz", "Panorámica"],
     color: "from-slate-700/80",
   },
