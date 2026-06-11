@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/iruzspa1/public_html/cdcspa.cl
+    - /bin/cp -rf $TRAVIS_BUILD_DIR/out/. $DEPLOYPATH
