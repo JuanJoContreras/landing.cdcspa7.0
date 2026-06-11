@@ -1,14 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Phone, Mail, MapPin, Home, Hash, MessageSquare, Send, CheckCircle2, Loader2 } from "lucide-react";
+import { User, Phone, Mail, MapPin, Home, Hash, MessageSquare, Send, Loader2 } from "lucide-react";
 import { WHATSAPP_URL } from "@/lib/utils";
 
-const FORMSPREE_ENDPOINT = "https://formspree.io/f/meewlalo";
+const FORMSPREE_ENDPOINT = "https://cdcspa.cl/contact.php";
 
 const schema = z.object({
   nombre: z.string().min(3, "Ingresa tu nombre completo").max(80),
@@ -48,12 +49,10 @@ declare global {
 
 function fireConversionEvents() {
   if (typeof window === "undefined") return;
-  // GA4 event
   window.gtag?.("event", "generate_lead", {
     event_category: "formulario",
     event_label: "cotizacion_cdc",
   });
-  // Google Ads conversion
   window.gtag?.("event", "conversion", {
     send_to: "AW-11099128864/dQU-CPmRno0YEKCIvawp",
     value: 1.0,
@@ -62,7 +61,8 @@ function fireConversionEvents() {
 }
 
 export function FormSection() {
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const router = useRouter();
+  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -78,8 +78,8 @@ export function FormSection() {
       });
       if (!res.ok) throw new Error("Formspree error");
       fireConversionEvents();
-      setStatus("success");
       reset();
+      router.push("/gracias");
     } catch {
       setStatus("error");
     }
@@ -158,128 +158,104 @@ export function FormSection() {
           >
             <div className="bg-white rounded-3xl shadow-[0_8px_40px_rgba(26,60,94,0.12)] p-6 md:p-10">
               <AnimatePresence mode="wait">
-                {status === "success" ? (
-                  <motion.div
-                    key="success"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="flex flex-col items-center text-center py-12 gap-5"
-                  >
-                    <div className="w-20 h-20 bg-green-400/10 rounded-full flex items-center justify-center">
-                      <CheckCircle2 size={40} className="text-green-400" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-[#1A3C5E]">¡Cotización enviada!</h3>
-                    <p className="text-[#4A4A4A] leading-relaxed max-w-sm text-sm">
-                      Un ejecutivo CDC te contactará en las próximas <strong>24 horas hábiles</strong>.
+                <motion.form key="form" onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+                  <div className="mb-4">
+                    <h3 className="text-xl font-bold text-[#1A3C5E]">Solicita tu cotización gratuita</h3>
+                    <p className="text-[#8A8A8E] text-xs mt-1">Todos los campos marcados son obligatorios</p>
+                  </div>
+
+                  {status === "error" && (
+                    <p className="text-red-500 text-sm bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                      Hubo un problema al enviar. Intenta nuevamente o escríbenos por WhatsApp.
                     </p>
-                    <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-[#25D366] text-white font-semibold px-6 py-3 rounded-full text-sm">
-                      También escríbenos por WhatsApp
-                    </a>
-                    <button onClick={() => setStatus("idle")} className="text-[#8A8A8E] text-sm underline">
-                      Enviar otra consulta
-                    </button>
-                  </motion.div>
-                ) : (
-                  <motion.form key="form" onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
-                    <div className="mb-4">
-                      <h3 className="text-xl font-bold text-[#1A3C5E]">Solicita tu cotización gratuita</h3>
-                      <p className="text-[#8A8A8E] text-xs mt-1">Todos los campos marcados son obligatorios</p>
-                    </div>
+                  )}
 
-                    {status === "error" && (
-                      <p className="text-red-500 text-sm bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-                        Hubo un problema al enviar. Intenta nuevamente o escríbenos por WhatsApp.
-                      </p>
-                    )}
-
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <div>
-                        <label htmlFor="nombre" className="label-field">
-                          <span className="flex items-center gap-1.5"><User size={12} aria-hidden /> Nombre completo *</span>
-                        </label>
-                        <input id="nombre" type="text" placeholder="Ej: María González"
-                          {...register("nombre")}
-                          className={`input-field ${errors.nombre ? "input-error" : ""}`} />
-                        {errors.nombre && <p className="text-red-500 text-xs mt-1">{errors.nombre.message}</p>}
-                      </div>
-                      <div>
-                        <label htmlFor="telefono" className="label-field">
-                          <span className="flex items-center gap-1.5"><Phone size={12} aria-hidden /> Teléfono / WhatsApp *</span>
-                        </label>
-                        <input id="telefono" type="tel" placeholder="+56 9 XXXX XXXX"
-                          {...register("telefono")}
-                          className={`input-field ${errors.telefono ? "input-error" : ""}`} />
-                        {errors.telefono && <p className="text-red-500 text-xs mt-1">{errors.telefono.message}</p>}
-                      </div>
-                    </div>
-
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <div>
-                        <label htmlFor="email" className="label-field">
-                          <span className="flex items-center gap-1.5"><Mail size={12} aria-hidden /> Correo electrónico *</span>
-                        </label>
-                        <input id="email" type="email" placeholder="correo@ejemplo.cl"
-                          {...register("email")}
-                          className={`input-field ${errors.email ? "input-error" : ""}`} />
-                        {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
-                      </div>
-                      <div>
-                        <label htmlFor="comuna" className="label-field">
-                          <span className="flex items-center gap-1.5"><MapPin size={12} aria-hidden /> Comuna / Región *</span>
-                        </label>
-                        <input id="comuna" type="text" placeholder="Ej: Las Condes, Santiago"
-                          {...register("comuna")}
-                          className={`input-field ${errors.comuna ? "input-error" : ""}`} />
-                        {errors.comuna && <p className="text-red-500 text-xs mt-1">{errors.comuna.message}</p>}
-                      </div>
-                    </div>
-
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <div>
-                        <label htmlFor="tipoProyecto" className="label-field">
-                          <span className="flex items-center gap-1.5"><Home size={12} aria-hidden /> Tipo de proyecto *</span>
-                        </label>
-                        <select id="tipoProyecto" {...register("tipoProyecto")} defaultValue=""
-                          className={`input-field ${errors.tipoProyecto ? "input-error" : ""}`}>
-                          <option value="" disabled>Selecciona una opción</option>
-                          {tiposProyecto.map((t) => <option key={t} value={t}>{t}</option>)}
-                        </select>
-                        {errors.tipoProyecto && <p className="text-red-500 text-xs mt-1">{errors.tipoProyecto.message}</p>}
-                      </div>
-                      <div>
-                        <label htmlFor="cantidadVentanas" className="label-field">
-                          <span className="flex items-center gap-1.5"><Hash size={12} aria-hidden /> ¿Cuántas ventanas? *</span>
-                        </label>
-                        <select id="cantidadVentanas" {...register("cantidadVentanas")} defaultValue=""
-                          className={`input-field ${errors.cantidadVentanas ? "input-error" : ""}`}>
-                          <option value="" disabled>Selecciona una opción</option>
-                          {cantidadesVentanas.map((c) => <option key={c} value={c}>{c}</option>)}
-                        </select>
-                        {errors.cantidadVentanas && <p className="text-red-500 text-xs mt-1">{errors.cantidadVentanas.message}</p>}
-                      </div>
-                    </div>
-
+                  <div className="grid sm:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="mensaje" className="label-field">
-                        <span className="flex items-center gap-1.5"><MessageSquare size={12} aria-hidden /> Mensaje adicional <span className="text-[#8A8A8E] font-normal">(opcional)</span></span>
+                      <label htmlFor="nombre" className="label-field">
+                        <span className="flex items-center gap-1.5"><User size={12} aria-hidden /> Nombre completo *</span>
                       </label>
-                      <textarea id="mensaje" rows={3} placeholder="Cuéntanos más sobre tu proyecto..."
-                        {...register("mensaje")}
-                        className="input-field resize-none" />
+                      <input id="nombre" type="text" placeholder="Ej: María González"
+                        {...register("nombre")}
+                        className={`input-field ${errors.nombre ? "input-error" : ""}`} />
+                      {errors.nombre && <p className="text-red-500 text-xs mt-1">{errors.nombre.message}</p>}
                     </div>
+                    <div>
+                      <label htmlFor="telefono" className="label-field">
+                        <span className="flex items-center gap-1.5"><Phone size={12} aria-hidden /> Teléfono / WhatsApp *</span>
+                      </label>
+                      <input id="telefono" type="tel" placeholder="+56 9 XXXX XXXX"
+                        {...register("telefono")}
+                        className={`input-field ${errors.telefono ? "input-error" : ""}`} />
+                      {errors.telefono && <p className="text-red-500 text-xs mt-1">{errors.telefono.message}</p>}
+                    </div>
+                  </div>
 
-                    <button type="submit" disabled={status === "loading"}
-                      className="w-full btn-primary justify-center font-bold py-4 rounded-full transition-all disabled:opacity-60 text-base mt-2">
-                      {status === "loading" ? (
-                        <><Loader2 size={20} className="animate-spin" /> Enviando...</>
-                      ) : (
-                        <><Send size={18} /> Enviar solicitud de cotización</>
-                      )}
-                    </button>
-                    <p className="text-[#8A8A8E] text-xs text-center">Sin compromiso · Respuesta a la brevedad</p>
-                  </motion.form>
-                )}
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="email" className="label-field">
+                        <span className="flex items-center gap-1.5"><Mail size={12} aria-hidden /> Correo electrónico *</span>
+                      </label>
+                      <input id="email" type="email" placeholder="correo@ejemplo.cl"
+                        {...register("email")}
+                        className={`input-field ${errors.email ? "input-error" : ""}`} />
+                      {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+                    </div>
+                    <div>
+                      <label htmlFor="comuna" className="label-field">
+                        <span className="flex items-center gap-1.5"><MapPin size={12} aria-hidden /> Comuna / Región *</span>
+                      </label>
+                      <input id="comuna" type="text" placeholder="Ej: Las Condes, Santiago"
+                        {...register("comuna")}
+                        className={`input-field ${errors.comuna ? "input-error" : ""}`} />
+                      {errors.comuna && <p className="text-red-500 text-xs mt-1">{errors.comuna.message}</p>}
+                    </div>
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="tipoProyecto" className="label-field">
+                        <span className="flex items-center gap-1.5"><Home size={12} aria-hidden /> Tipo de proyecto *</span>
+                      </label>
+                      <select id="tipoProyecto" {...register("tipoProyecto")} defaultValue=""
+                        className={`input-field ${errors.tipoProyecto ? "input-error" : ""}`}>
+                        <option value="" disabled>Selecciona una opción</option>
+                        {tiposProyecto.map((t) => <option key={t} value={t}>{t}</option>)}
+                      </select>
+                      {errors.tipoProyecto && <p className="text-red-500 text-xs mt-1">{errors.tipoProyecto.message}</p>}
+                    </div>
+                    <div>
+                      <label htmlFor="cantidadVentanas" className="label-field">
+                        <span className="flex items-center gap-1.5"><Hash size={12} aria-hidden /> ¿Cuántas ventanas? *</span>
+                      </label>
+                      <select id="cantidadVentanas" {...register("cantidadVentanas")} defaultValue=""
+                        className={`input-field ${errors.cantidadVentanas ? "input-error" : ""}`}>
+                        <option value="" disabled>Selecciona una opción</option>
+                        {cantidadesVentanas.map((c) => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                      {errors.cantidadVentanas && <p className="text-red-500 text-xs mt-1">{errors.cantidadVentanas.message}</p>}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="mensaje" className="label-field">
+                      <span className="flex items-center gap-1.5"><MessageSquare size={12} aria-hidden /> Mensaje adicional <span className="text-[#8A8A8E] font-normal">(opcional)</span></span>
+                    </label>
+                    <textarea id="mensaje" rows={3} placeholder="Cuéntanos más sobre tu proyecto..."
+                      {...register("mensaje")}
+                      className="input-field resize-none" />
+                  </div>
+
+                  <button type="submit" disabled={status === "loading"}
+                    className="w-full btn-primary justify-center font-bold py-4 rounded-full transition-all disabled:opacity-60 text-base mt-2">
+                    {status === "loading" ? (
+                      <><Loader2 size={20} className="animate-spin" /> Enviando...</>
+                    ) : (
+                      <><Send size={18} /> Enviar solicitud de cotización</>
+                    )}
+                  </button>
+                  <p className="text-[#8A8A8E] text-xs text-center">Sin compromiso · Respuesta a la brevedad</p>
+                </motion.form>
               </AnimatePresence>
             </div>
           </motion.div>
