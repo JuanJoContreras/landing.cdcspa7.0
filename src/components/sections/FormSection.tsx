@@ -8,6 +8,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { User, Phone, Mail, MapPin, Home, Hash, MessageSquare, Send, CheckCircle2, Loader2 } from "lucide-react";
 import { WHATSAPP_URL } from "@/lib/utils";
 
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/meewlalo";
+
 const schema = z.object({
   nombre: z.string().min(3, "Ingresa tu nombre completo").max(80),
   telefono: z.string().min(9, "Ingresa un teléfono válido").max(15).regex(/^[+\d\s()-]{9,15}$/, "Formato inválido"),
@@ -38,8 +40,29 @@ const cantidadesVentanas = [
   "No lo sé aún",
 ];
 
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
+
+function fireConversionEvents() {
+  if (typeof window === "undefined") return;
+  // GA4 event
+  window.gtag?.("event", "generate_lead", {
+    event_category: "formulario",
+    event_label: "cotizacion_cdc",
+  });
+  // Google Ads conversion
+  window.gtag?.("event", "conversion", {
+    send_to: "AW-11099128864/dQU-CPmRno0YEKCIvawp",
+    value: 1.0,
+    currency: "CLP",
+  });
+}
+
 export function FormSection() {
-  const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -47,10 +70,19 @@ export function FormSection() {
 
   const onSubmit = async (data: FormValues) => {
     setStatus("loading");
-    await new Promise((res) => setTimeout(res, 1800));
-    console.log("Lead:", data);
-    setStatus("success");
-    reset();
+    try {
+      const res = await fetch(FORMSPREE_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error("Formspree error");
+      fireConversionEvents();
+      setStatus("success");
+      reset();
+    } catch {
+      setStatus("error");
+    }
   };
 
   return (
@@ -154,6 +186,12 @@ export function FormSection() {
                       <h3 className="text-xl font-bold text-[#1A3C5E]">Solicita tu cotización gratuita</h3>
                       <p className="text-[#8A8A8E] text-xs mt-1">Todos los campos marcados son obligatorios</p>
                     </div>
+
+                    {status === "error" && (
+                      <p className="text-red-500 text-sm bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                        Hubo un problema al enviar. Intenta nuevamente o escríbenos por WhatsApp.
+                      </p>
+                    )}
 
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>

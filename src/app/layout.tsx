@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+const GA4_ID = "G-REMYLBP0CL";
+const GTM_ID = "GTM-KC6K7S25";
+
 export const metadata: Metadata = {
   title: "Ventanas PVC Termopanel Santiago | CDC SPA – Cotiza Gratis",
   description:
@@ -183,24 +186,9 @@ const jsonLdBreadcrumb = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   itemListElement: [
-    {
-      "@type": "ListItem",
-      position: 1,
-      name: "Inicio",
-      item: "https://cdcspa.cl",
-    },
-    {
-      "@type": "ListItem",
-      position: 2,
-      name: "Ventanas PVC Termopanel Santiago",
-      item: "https://cdcspa.cl/#productos",
-    },
-    {
-      "@type": "ListItem",
-      position: 3,
-      name: "Cotizar Ventanas PVC Santiago",
-      item: "https://cdcspa.cl/#cotizar",
-    },
+    { "@type": "ListItem", position: 1, name: "Inicio", item: "https://cdcspa.cl" },
+    { "@type": "ListItem", position: 2, name: "Ventanas PVC Termopanel Santiago", item: "https://cdcspa.cl/#productos" },
+    { "@type": "ListItem", position: 3, name: "Cotizar Ventanas PVC Santiago", item: "https://cdcspa.cl/#cotizar" },
   ],
 };
 
@@ -260,6 +248,27 @@ export default function RootLayout({
   return (
     <html lang="es-CL">
       <head>
+        {/* GTM - head snippet */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','${GTM_ID}');`,
+          }}
+        />
+        {/* GA4 */}
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`} />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${GA4_ID}');
+gtag('config', 'AW-11099128864');`,
+          }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <script
@@ -275,7 +284,18 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFAQ) }}
         />
       </head>
-      <body className="overflow-x-hidden">{children}</body>
+      <body className="overflow-x-hidden">
+        {/* GTM - body snippet */}
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+          />
+        </noscript>
+        {children}
+      </body>
     </html>
   );
 }
