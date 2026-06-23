@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 const GA4_ID = "G-REMYLBP0CL";
-const GTM_ID = "GTM-KC6K7S25";
+const GTM_ID = "GTM-KHRFMZN";
 
 export const metadata: Metadata = {
   title: "Ventanas PVC Termopanel Santiago | CDC SPA – Cotiza Gratis",
