@@ -2,4 +2,6 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/iruzspa1/public_html/cdcspa.cl
+    - git -C $DEPLOYPATH reset --hard HEAD
+    - git -C $DEPLOYPATH clean -fd
     - /bin/cp -rf $DEPLOYPATH/out/. $DEPLOYPATH
